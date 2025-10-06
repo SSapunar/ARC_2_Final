@@ -1,12 +1,15 @@
-module alu(a, b, s, out);
+module alu(a, b, s, out, z, n, c, v);
    input [7:0] a, b;
    input [2:0] s;          // 3 bits pa’ meter 8 operaciones, bien apretaditas
    output [7:0] out;
+   output z, n, c, v;
 
    reg [7:0] out;
+   reg carry;
 
    // pa’ no andar arriando la lista de sensibilidad a pura rienda.
    always @* begin
+		carry = 0;
 	   case (s)
 		   3'b000: out = a + b;   // ADD  -> arre caballito
 		   3'b001: out = a - b;   // SUB  -> pa’ atrás con dignidad
@@ -19,4 +22,10 @@ module alu(a, b, s, out);
 		   default: out = 8'h00;  // CAMBIO: por si el potro se desboca con un s distinto.
 	   endcase
    end
+
+  assign z = (out == 8'h00);
+  assign n = out[7];
+  assign c = carry;
+  assign v = (s==3'b000 || s==3'b001) ? (a[7]==b[7] && out[7]!=a[7]) : 0;
+  
 endmodule

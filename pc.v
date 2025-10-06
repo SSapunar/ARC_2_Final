@@ -1,11 +1,15 @@
-// pc.v
-module pc(clk, pc);
+module pc(clk, pc, load, new_value);
   input  wire clk;
-  output reg  [6:0] pc;   // 7 bits → 128 instrucciones
+  input  wire load;
+  input  wire [6:0] new_value;
+  output reg  [6:0] pc;
 
   initial pc = 7'd0;
 
   always @(posedge clk) begin
-    pc <= pc + 7'd1;
+    if (load)
+      pc <= new_value;
+    else
+      pc <= pc + 7'd1;
   end
 endmodule
