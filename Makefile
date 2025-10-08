@@ -23,7 +23,7 @@ WAVEFORM_FILE  = $(OUT_DIR)/dump.vcd
 # ---------- GTKWave (forzar Flatpak para evitar conflictos con snap/core20) ----------
 # Guarda una vista en File → Write Save File… como out/wave.gtkw para que se cargue sola.
 WAVE_SAVE ?= $(OUT_DIR)/wave.gtkw
-GTKWAVE_BIN := flatpak run io.github.gtkwave.GTKWave
+GTKWAVE_BIN := gtkwave
 
 # Targets
 .PHONY: all build run wave synth clean
