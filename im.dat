@@ -227,21 +227,21 @@
 // Instruction 82: MOV B, 50
 000001100110010
 // Instruction 83: INC B
-010010000000000
+010010000000001
 
 // Test Case 2: Increment from Zero
 // B = 0. Result should be 0 + 1 = 1.
 // Instruction 84: MOV B, 0
 000001100000000
 // Instruction 85: INC B
-010010000000000
+010010000000001
 
 // Test Case 3: Rollover/Overflow Test
 // B = 255. Result should be 255 + 1 = 0 (8-bit overflow).
 // Instruction 86: MOV B, 255 (11111111)
 000001111111111
 // Instruction 87: INC B
-010010000000000
+010010000000001
 // --- Padding: NOPs to reach 128 words ---
 
 // Instruction 88: NOP
@@ -325,4 +325,6 @@
 // Instruction 127: NOP
 000000000000000
 // Instruction 128: NOP
+000000000000000
+// Instruction 129: NOP
 000000000000000

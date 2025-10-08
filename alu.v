@@ -1,31 +1,61 @@
-module alu(a, b, s, out, z, n, c, v);
-   input [7:0] a, b;
-   input [2:0] s;          // 3 bits pa’ meter 8 operaciones, bien apretaditas
-   output [7:0] out;
-   output z, n, c, v;
+// alu.v — versión corregida: operaciones unarias usan solo 'a'
+module alu(
+    input  [7:0] a,      // operando principal (para unarias) o primer operando (para binarias)
+    input  [7:0] b,      // segundo operando (solo usado en operaciones binarias)
+    input  [2:0] s,      // operación: 000=ADD, 001=SUB, 010=AND, 011=OR, 100=XOR, 101=NOT, 110=SHL, 111=SHR
+    output [7:0] out,
+    output       z, n, c, v
+);
 
-   reg [7:0] out;
-   reg carry;
+    reg [8:0] result;  // resultado de 9 bits para capturar carry
+    reg       carry_out;
 
-   // pa’ no andar arriando la lista de sensibilidad a pura rienda.
-   always @* begin
-		carry = 0;
-	   case (s)
-		   3'b000: out = a + b;   // ADD  -> arre caballito
-		   3'b001: out = a - b;   // SUB  -> pa’ atrás con dignidad
-		   3'b010: out = a & b;   // AND  -> yunta bien junta
-		   3'b011: out = a | b;   // OR   -> juntamos las veredas
-		   3'b100: out = a ^ b;   // XOR  -> picardía
-		   3'b101: out = ~a;      // NOT A -> damos vuelta el poncho
-		   3'b110: out = a << 1;  // SHL A -> corrío pa’ la izquierda
-		   3'b111: out = a >> 1;  // SHR A -> corrío pa’ la derecha
-		   default: out = 8'h00;  // CAMBIO: por si el potro se desboca con un s distinto.
-	   endcase
-   end
+    always @(*) begin
+        case (s)
+            3'b000: begin // ADD
+                result = {1'b0, a} + {1'b0, b};
+                carry_out = result[8];
+            end
+            3'b001: begin // SUB
+                result = {1'b0, a} - {1'b0, b};
+                carry_out = ~result[8]; // carry = no borrow
+            end
+            3'b010: begin // AND
+                result = {1'b0, a & b};
+                carry_out = 1'b0;
+            end
+            3'b011: begin // OR
+                result = {1'b0, a | b};
+                carry_out = 1'b0;
+            end
+            3'b100: begin // XOR
+                result = {1'b0, a ^ b};
+                carry_out = 1'b0;
+            end
+            3'b101: begin // NOT — usa solo 'a'
+                result = {1'b0, ~a};
+                carry_out = 1'b0;
+            end
+            3'b110: begin // SHL — usa solo 'a'
+                result = {1'b0, a << 1};
+                carry_out = a[7]; // bit desplazado hacia afuera
+            end
+            3'b111: begin // SHR — usa solo 'a'
+                result = {1'b0, a >> 1};
+                carry_out = a[0]; // bit desplazado hacia afuera
+            end
+            default: begin
+                result = 9'h000;
+                carry_out = 1'b0;
+            end
+        endcase
+    end
 
-  assign z = (out == 8'h00);
-  assign n = out[7];
-  assign c = carry;
-  assign v = (s==3'b000 || s==3'b001) ? (a[7]==b[7] && out[7]!=a[7]) : 0;
-  
+    assign out = result[7:0];
+    assign z = (out == 8'h00);
+    assign n = out[7];
+    assign c = carry_out;
+    // Overflow solo para ADD/SUB: V = (A7 == B7) && (OUT7 != A7)
+    assign v = (s == 3'b000 || s == 3'b001) ? (a[7] == b[7] && out[7] != a[7]) : 1'b0;
+
 endmodule
