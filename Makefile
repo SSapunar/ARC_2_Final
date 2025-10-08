@@ -2,13 +2,16 @@
 VERILOG_FILES = \
   computer.v \
   alu.v \
+  control_unit.v \
   pc.v \
   mux2.v \
   instruction_memory.v \
-  register.v
+  data_memory.v \
+  register.v \
+  status_register.v
 # (si luego agregas data_memory.v o control_unit.v, súmalos aquí)
 
-TESTBENCH_FILE = testbench.v
+TESTBENCH_FILE = testbench_memory.v
 YOSYS_SCRIPT   = yosys.tcl
 IVERILOG_FLAGS = -g2012
 
