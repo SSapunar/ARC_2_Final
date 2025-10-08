@@ -9,7 +9,7 @@ module computer(input wire clk);
   wire [7:0] literal = im_out[7:0];
   wire [7:0] regA_out, regB_out;
   wire [7:0] alu_out, data_out;
-  wire loadA, loadB, mem_write, mem_read, use_mem_addr, mem_src;
+  wire loadA, loadB, mem_write, mem_read, use_mem_addr, use_mem_data, mem_src;
   wire [2:0] alu_s;
   wire [1:0] src_sel, dst_sel, wb_sel;
   wire use_lit;
@@ -24,7 +24,7 @@ module computer(input wire clk);
     .alu_s(alu_s), .src_sel(src_sel),
     .dst_sel(dst_sel), .wb_sel(wb_sel),
     .use_lit(use_lit), .use_mem_addr(use_mem_addr),
-    .mem_src(mem_src)
+    .use_mem_data(use_mem_data), .mem_src(mem_src)
   );
 
   // --- Operandos ALU ---
@@ -37,13 +37,13 @@ module computer(input wire clk);
 
   wire [7:0] alu_a_normal = (dst_sel == 2'b00) ? regA_out : regB_out;
   wire [7:0] alu_b_normal = 
+      use_mem_data ? data_out :
       use_lit ? literal :
-      use_mem_addr ? data_out :
       (src_sel == 2'b00) ? regB_out :
       (src_sel == 2'b01) ? regA_out : 8'h00;
 
   wire [7:0] alu_a_sub = regA_out;
-  wire [7:0] alu_b_sub = use_lit ? literal : (use_mem_addr ? data_out : regB_out);
+  wire [7:0] alu_b_sub = use_mem_data ? data_out : (use_lit ? literal : regB_out);
   wire [7:0] alu_a_unary = (src_sel == 2'b00) ? regB_out : regA_out;
   wire [7:0] alu_a_inc = regB_out;
 
